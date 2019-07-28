@@ -189,10 +189,10 @@ WHERE order_num = 200008;
 ```
 输出：
 ```
-prod_id         quantity       item_price      expanded_price
---------------------------------------------------------------
-RGAN01			5				4.9900			24.9500
-BR03			5				11.9900			59.9500
+prod_id  quantity  item_price  expanded_price
+---------------------------------------------
+RGAN01  5  4.9900  24.9500
+BR03  5  11.9900  59.9500
 ```
 这里实现的就是使用`quantity*item_price`创建一个名为`expanded_price`的计算字段，也就是一个新列。
 
@@ -253,4 +253,4 @@ SELECT col1 + col2 total, col3
    - [21分钟 MySQL 入门教程](https://www.cnblogs.com/mr-wid/archive/2013/05/09/3068229.html)
    - [MySQL索引背后的数据结构及算法原理](http://blog.codinglabs.org/articles/theory-of-mysql-index.html)
 - 非关系数据库MongoDB：[The Little MongoDB Book](https://github.com/justinyhuang/the-little-mongodb-book-cn/blob/master/mongodb.md)
-- [非关系型数据库和关系型数据库区别，优势比较](https://www.zhihu.com/question/24225007)
+- 知乎问题：[非关系型数据库和关系型数据库区别，优势比较](https://www.zhihu.com/question/24225007)
