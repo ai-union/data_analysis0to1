@@ -411,4 +411,5 @@ COALESCE(col_2,'no DATA') -- 将col_2中的NULL值替换为no DATA
 |ORDER BY |	对输出进行排序 	|否|
 |LIMIT |	限制输出的行数 	|否|
 
-(欠一份sql mind map, 近期补上）
+#### 附：数据分析师的SQL思维导图
+![mnDQDU.jpg](https://s2.ax1x.com/2019/08/17/mnDQDU.jpg)
