@@ -1,0 +1,256 @@
+# Python基础
+Hello各位，上周我们学习了Python的编码规范、变量、数据类型与运算符、控制流以及函数，不知道大家有没有尝试下在本地环境中去动动手，敲敲代码呢？本周呢，我们就来一起把上周学习的零散内容，串在一起，锻炼编程思维，用Python实现一个常用的小工具，
+
+## 本周内容
+- 输入与输出
+- 错误与异常
+- 读写本地文件
+- 模块的导入
+- 天气小闹钟
+
+ 
+### 输入和输出
+想要与用户进行交互，就需要我们获取用户的输入，并且根据输入去处理再输出结果。
+ 
+- 输入：`input`函数
+
+在python中，我们使用`input`函数来获取用户的输入，但要注意，`input`函数返回的结果，都是字符串类型的。
+ 示例：
+ ```python
+ name = input("请输入您的姓名：")
+ >>> 结果： 请输入您的姓名：
+ ```
+ > 我们可以使用`type`函数来查看某一变量的数据类型，你可以尝试下，用input获取数字后，变量的数据类型是什么？
+ 
+ 
+- 输出：`print`函数
+ 
+ 我们对输出已经很熟悉了，但当我们怎样实现按照某种模版进行输出呢？这就需要输出格式化出场啦！
+示例：
+```python
+name = 'Allen'
+age = 26
+
+#方式一
+print('大家好，我是{}，今年{}岁。'.format(name,age))
+
+#方式二
+print(f'大家好，我是{name}，今年{age}岁。')
+>>>结果：大家好，我是Allen，今年26岁。
+```
+可以看到，格式化输出就像是在往坑里种萝卜，第一种方式是先挖好坑（大括号），然后再按照顺序把变量逐个放进去，第二种是直接把萝卜种到坑里，注意，一个萝卜一个坑，大括号对的数量要与变量一一对应哦！
+  
+ 
+### 错误与异常
+
+> 编写代码的过程，就是与bug无限争斗的过程。
+
+#### 如何读懂报错
+下面以Jupyter Notebook为例，给大家简要讲解下，当出现错误时，如何去修复bug。
+我们以上周最后的一个函数为例，大家看如下报错：
+![my5BkT.png](https://s2.ax1x.com/2019/08/24/my5BkT.png)
+- 先看错误类型
+错误类型即红色标出的`TypeError`，并且在最后一行也给出了解释` '>' not supported between instances of 'str' and 'int'`，我们得知，是由于我们用大于号比较了字符串与整型，这两种数据类型不匹配，导致的数据类型错误。
+> 刚开始时，可以直接复制最后一行到浏览器去查询报错原因。
+- 再看出错位置
+错误位置可以通过绿色的箭头`---->`来判定，我们可以看到错误出现在了函数`score_to_grade`中的第二行代码`if score > 90`这里。
+
+综上，我们得知，是在函数中没有考虑用户输入的问题，所以，我们可以添加提示，并将字符串转为数字类型。
+```python
+#解决方案不唯一，你也可以给出自己的方案
+def score_to_grade(): #定义函数，输入成绩score
+    score = float(input('请输入得分（数字）'))
+    if score > 90:
+        return ('你获得了：A')
+    elif score > 80:
+        return ('你获得了：B')
+    else:
+        return ('你获得了：C')  
+```
+
+#### 无法避免的错误
+有时候，我们无法避免一些可能出现的错误，还是以上面的函数为例，就算进行了提示，但依然会有人输入'九十'之类的值，那我们又不想让函数报错并终止，这时候我们就需要`try...except...`语句进行`错误捕捉`。
+
+ 
+- `try`：这是 `try` 语句中的唯一必需子句。该块中的代码是 Python 在 `try` 语句中首先运行的代码。
+- `except`：如果 Python 在运行 `try` 块时遇到异常，它将跳到处理该异常的 `except` 块。
+- `else`：如果 Python 在运行 `try` 块时没有遇到异常，它将在运行 `try` 块后运行该块中的代码。
+- `finally`：在 Python 离开此 `try` 语句之前，在任何情形下它都将运行此 `finally` 块中的代码，即使要结束程序，例如：如果 Python 在运行 `except` 或 `else` 块中的代码时遇到错误，在停止程序之前，依然会执行此`finally` 块。
+ 
+所以，我们可以把函数修改为“当用户输入的数据类型不正确时，可以给她进行提示，让她进行更正”，那么代码可以修改为：
+```python
+def score_to_grade(): #定义函数，输入成绩score
+    while True: #使用while循环，只要没输入数字，就一直循环
+        try:
+            score = float(input('请输入得分（数字）'))
+            break #如果输入数字，则跳出while循环
+        except ValueError:
+            print('请确保输入的是数字哦')
+            
+    if score > 90:
+        return ('你获得了：A')
+    elif score > 80:
+        return ('你获得了：B')
+    else:
+        return ('你获得了：C')  
+```
+
+### 读写文件
+ 
+- `open()`即打开文件，用法如下：
+ 
+  ```
+  open(文件名, 读写模式，文件编码)
+  ```
+但使用`open()`函数打开的文件是不会自动关闭的，需要使用`close()`函数手动关闭，这就很麻烦，如果只打开忘记关闭的话，打开的文件就会一直占据内存，导致运算效率降低，所以，一般使用`open()`时，都会在前面加上一个`with`，这样，在操作完`with`包含的语句之后，他就会帮我们自动关闭文件，省去了很多麻烦。
+```python
+with open(filename,'r',encoding='utf-8') as f:
+    content = f.read() #读取文件内容并赋值给content
+```
+> 你也可以自己写一个for循环，不断打开某文件，试试看你的电脑最多能同时打开多少个文件。
+
+- 常用的读写模式：
+ 
+  | 模式 | 描述                                                         |
+  | ---- | ------------------------------------------------------------ |
+  | r    | 只读。默认模式                                               |
+  | rb   | 二进制只读。                                                 |
+  | r+   | 读写。                                                       |
+  | rb+  | 二进制读写。                                                 |
+  | w    | 写入。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被删除，不想删除可参考模式`a`。如果该文件不存在，创建新文件。 |
+  | wb   | 二进制写入。其余同上                                         |
+  | w+   | 读写。其余同上                                               |
+  | wb+  | 二进制读写。其余同上                                         |
+  | a    | 追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。 |
+  | ab   | 二进制追加。其余同上                                         |
+  | a+   | 读写。其余同上                                               |
+  | ab+  | 二进制追加。其余同上                                         |
+ 
+### 导入模块/函数
+#### 导入别人写的模块
+```python
+#使用import导入模块
+import pandas
+#使用as来定制别名，方便后面代码调用
+import pandas as pd
+#使用from来调用模块中的某一方法
+from pandas import DataFrame as df
+```
+#### 导入自己写的模块
+虽然Python的第三方库数量众多，覆盖面广泛，但针对个性问题，有时候还是需要我们自己动手去写一些函数，方便重复利用。
+这时，需要我们提前讲需要调用的函数写进一个拓展名为`.py`的脚本文件中，
+并将这个脚本文件放在与调用它的文件相同文件夹中。
+```python
+#依然是使用import和from
+#从文件名为useful_funcs的文件中，导入score_to_grade函数
+from useful_funcs import score_to_grade
+#导入所有函数
+from useful_funcs import *
+```
+
+### 天气小闹钟
+接下来，我们利用一个`天气小闹钟`的实现过程，来熟悉一下如何去拆分步骤，逐个实现，如何去解决问题，一一击破。我们可以尝试画一个思维导图来去解决这个问题。
+![m6D9Yt.png](https://s2.ax1x.com/2019/08/24/m6D9Yt.png)
+
+接下来，我们按照步骤逐个去实现不同的模块。
+#### 设定模块
+```python
+def get_city_time():
+    '''
+    设定城市和时间，并返回
+    '''
+    city = input('请设定您的城市：')
+    #选择24小时制还是12小时制呢？
+    #思考，我们这里得到的数据是要交付到下一个时间模块的
+    #那么，时间模块需要什么样的数据，我们就设定什么样的数据就好了
+    #所以这里先随便写一个，等后面再改
+    alarm_time = input('请设定闹钟时间（24小时制，格式为小时-分钟），如13-30表示下午一点半：')
+    return city,alarm_time
+```
+> 边写边在Notebook中进行测试哦～有bug随时解决掉！
+
+#### 时间模块
+然后是时间模块，但我们之前并没有接触过任何与时间有关的函数，我们求助搜索引擎吧。
+> 快速有效的搜索，是一项重要能力。一般情况下，关键字选择python+想实现的功能，比如说`python 闹钟`
+
+很容易就能找到一个叫做`time`的模块可以用来获取本地时间，这正是我们想要的。
+```python
+import time
+def compare_time(alarm_time):
+    '''
+    比较闹钟时间与本地时间，返回True或者False
+    '''
+    local_time = time.localtime()
+    #需要对时间进行格式化，继续搜索关键字就能解决问题
+    now_time = time.strftime("%H-%M", local_time)
+    #因为后面的天气模块是否启动，依赖于时间模块的判定，所以这里返回bool值
+    return(now_time==alarm_time)
+```
+#### 天气模块
+我们可以通过网络爬虫或者一些天气网站的开放API去获取某一城市的天气，这里可能会稍难一些，但依然可以通过搜索关键字`python 天气`或者`python 爬虫`去尝试学习并解决。
+> 如果想系统学习爬虫，可以参考AI派的爬虫专栏（）
+
+这里我选择的是利用[天气API](https://www.tianqiapi.com/?action=v6)，免费账户即可使用，但获取的结果是json文件，又是一个新东西，没关系，找搜索引擎解决！
+```python
+def get_weather(city):
+    '''
+    依据输入的城市名，利用API获取天气字典并输出
+    '''
+    params={'appid':'你的id','appsecret':'你的app密钥','version':'v6','city':city}
+    response = r.get('https://www.tianqiapi.com/api/',params=params)
+    weather_dict = json.loads(response.content.decode('utf-8'),encoding='utf-8')
+    return weather_dict
+```
+
+#### 格式化输出
+这一步也可以直接放在天气模块中。
+```python
+def output_str(weather_dict):
+    '''
+    对字典进行筛选，并进行格式化输出
+    '''
+    weather = weather_dict['wea']
+    tem = weather_dict['tem']
+    air_level = weather_dict['air_level']
+    air_tips = weather_dict['air_tips']
+    return(f'今天天气{weather}，当前温度{tem}摄氏度，空气质量{air_level}，今天{air_tips}！')
+```
+#### 把模块组合起来
+接下来，我们就按照步骤的顺序，把各个模块组合起来
+```python
+city,alarm_time = get_city_time()
+#这里用while，可以让脚本一直保持工作，但这种方法个人用一下还可以，如果是付储工业实践并不可取，想想是为什么呢？
+while True:
+    flag = compare_time(alarm_time)
+    #如果时间相等，那么就执行如下操作
+    if flag:
+        weather_dict = get_weather(city)
+        print(output_str(weather_dict))
+        #跳出while循环
+        break
+```
+#### 编写并执行脚本
+> 个人建议使用VScode进行脚本编写。
+
+把如上所有函数写在脚本中，但要在最后的模块组合前加上一句
+```python
+#添加这句的目的是为了以后再调用该脚本中的函数时，不会运行该语句包含的代码
+if __name__=='__main__':
+    city,alarm_time = get_city_time()
+    while True:
+        flag = compare_time(alarm_time)
+        ...
+```
+
+Windows用户可以在脚本文件所在的文件夹下，按住`Shift`和右击，选择`在此处打开命令窗口`；Mac用户可以右击脚本所在文件夹，选择`新建位于文件夹位置的终端窗口`。然后输入
+```
+python filename.py
+```
+即可运行你的小工具啦～
+![m2Oihd.gif](https://s2.ax1x.com/2019/08/25/m2Oihd.gif)
+#### 待优化
+- 优化用户交互，增加错误修改等功能；
+- 不能播放声音的闹钟算是闹钟吗？那文字转语音怎么搞？可以尝试下百度AIP；
+
+### 最后
+学编程，多动手就能事半功倍，学习的同时多尝试着用编程解决生活和工作中的问题，按照目标-拆分步骤，逐一实现，你，一定没问题哒！
